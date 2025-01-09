@@ -2,23 +2,41 @@
 
 #include <stdexcept>
 #include <algorithm>
+#include <utility>
 
 template <typename T>
 class ArrayPtr
 {
     public:
     ArrayPtr() = default;
+
+    ArrayPtr(const ArrayPtr&) = delete;
+    ArrayPtr& operator=(ArrayPtr&) = delete;
     
     explicit ArrayPtr(T* raw_ptr) noexcept
         : ptr_(raw_ptr) {
 
     }
 
-    ArrayPtr(const ArrayPtr&) = delete;
+    ArrayPtr(ArrayPtr&& other)
+    {
+        std::swap(this->ptr_, other.ptr_);
+    }
 
     ~ArrayPtr()
     {
         delete[] ptr_;
+    }
+
+    ArrayPtr& operator=(ArrayPtr&& rhs)
+    {
+        if(this->ptr_ == rhs.ptr_)
+        {
+            return *this;
+        }
+
+        std::swap(this->ptr_, rhs.ptr_);
+        return *this;
     }
 
     T* GetRawPtr() const noexcept
@@ -38,31 +56,21 @@ class ArrayPtr
         return ptr_ != nullptr;
     }
 
-    ArrayPtr& operator=(ArrayPtr& rhs)
-    {
-        if(ptr_ != rhs.GetRawPtr())
-        {
-            this->ptr_ = rhs.GetRawPtr();
-            rhs.Release();
-        }
-        return *this;
-    }
+
 
     void swap(ArrayPtr& rhs)
     {
         std::swap(ptr_, rhs.ptr_);
     }
 
-    T* operator->() const
+    T* operator->() const noexcept
     {
-        using namespace std::literals;
-        return !ptr_ ? throw std::logic_error("ArrayPtr is null"s) : ptr_;
+        return ptr_;
     }
 
-    T& operator*() const
+    T& operator*() const noexcept
     {
-        using namespace std::literals;
-        return !ptr_ ? throw std::logic_error("ArrayPtr is null"s) : *ptr_;
+        return *ptr_;
     }
 
     private:

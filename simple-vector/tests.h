@@ -342,17 +342,6 @@ inline void Test3()
 }
 
 inline void Test4() {
-    /*struct NoCopyStruct
-    {
-        int number_;
-        
-        NoCopyStruct(const NoCopyStruct&) = delete;
-        NoCopyStruct& operator=(const NoCopyStruct&) = delete;
-
-        NoCopyStruct(NoCopyStruct&&) = default;
-        NoCopyStruct& operator=(NoCopyStruct&&) = default;
-    };*/
-
     {
         SimpleVector<int> v({3, 42});
         SimpleVector<int> v_for_move;
